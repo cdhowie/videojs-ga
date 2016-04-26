@@ -25,6 +25,10 @@ videojs.plugin 'ga', (options = {}) ->
   # if you didn't specify a name, it will be 'guessed' from the video src after metadatas are loaded
   eventLabel = options.eventLabel || dataSetupOptions.eventLabel
 
+  trackerPrefix = options.trackerName || dataSetupOptions.trackerName || ''
+  if trackerPrefix && trackerPrefix.length
+    trackerPrefix = trackerPrefix + '.'
+
   # if debug isn't specified
   options.debug = options.debug || false
 
@@ -116,14 +120,14 @@ videojs.plugin 'ga', (options = {}) ->
   sendbeacon = ( action, nonInteraction, value ) ->
     # console.log action, " ", nonInteraction, " ", value
     if window.ga
-      ga 'send', 'event',
+      ga trackerPrefix + 'send', 'event',
         'eventCategory' 	: eventCategory
         'eventAction'		  : action
         'eventLabel'		  : getEventLabel()
         'eventValue'      : value
         'nonInteraction'	: nonInteraction
     else if window._gaq
-      _gaq.push(['_trackEvent', eventCategory, action, getEventLabel(), value, nonInteraction])
+      _gaq.push([trackerPrefix + '_trackEvent', eventCategory, action, getEventLabel(), value, nonInteraction])
     else if options.debug
       console.log("Google Analytics not detected")
     return

@@ -7,7 +7,7 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var dataSetupOptions, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, getEventLabel, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, resize, seekEnd, seekStart, seeking, sendbeacon, timeupdate, volumeChange;
+    var dataSetupOptions, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, getEventLabel, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, resize, seekEnd, seekStart, seeking, sendbeacon, timeupdate, trackerPrefix, volumeChange;
     if (options == null) {
       options = {};
     }
@@ -23,6 +23,10 @@
     percentsPlayedInterval = options.percentsPlayedInterval || dataSetupOptions.percentsPlayedInterval || 10;
     eventCategory = options.eventCategory || dataSetupOptions.eventCategory || 'Video';
     eventLabel = options.eventLabel || dataSetupOptions.eventLabel;
+    trackerPrefix = options.trackerName || dataSetupOptions.trackerName || '';
+    if (trackerPrefix && trackerPrefix.length) {
+      trackerPrefix = trackerPrefix + '.';
+    }
     options.debug = options.debug || false;
     percentsAlreadyTracked = [];
     seekStart = seekEnd = 0;
@@ -110,7 +114,7 @@
     };
     sendbeacon = function(action, nonInteraction, value) {
       if (window.ga) {
-        ga('send', 'event', {
+        ga(trackerPrefix + 'send', 'event', {
           'eventCategory': eventCategory,
           'eventAction': action,
           'eventLabel': getEventLabel(),
@@ -118,7 +122,7 @@
           'nonInteraction': nonInteraction
         });
       } else if (window._gaq) {
-        _gaq.push(['_trackEvent', eventCategory, action, getEventLabel(), value, nonInteraction]);
+        _gaq.push([trackerPrefix + '_trackEvent', eventCategory, action, getEventLabel(), value, nonInteraction]);
       } else if (options.debug) {
         console.log("Google Analytics not detected");
       }
