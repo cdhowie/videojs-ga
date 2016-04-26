@@ -1,13 +1,13 @@
 /*
-* videojs-ga - v0.4.2 - 2015-02-06
-* Copyright (c) 2015 Michael Bensoussan
+* videojs-ga - v0.4.2 - 2016-04-26
+* Copyright (c) 2016 Michael Bensoussan
 * Licensed MIT
 */
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   videojs.plugin('ga', function(options) {
-    var dataSetupOptions, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, resize, seekEnd, seekStart, seeking, sendbeacon, timeupdate, volumeChange;
+    var dataSetupOptions, defaultsEventsToTrack, end, error, eventCategory, eventLabel, eventsToTrack, fullscreen, getEventLabel, loaded, parsedOptions, pause, percentsAlreadyTracked, percentsPlayedInterval, play, resize, seekEnd, seekStart, seeking, sendbeacon, timeupdate, volumeChange;
     if (options == null) {
       options = {};
     }
@@ -27,6 +27,13 @@
     percentsAlreadyTracked = [];
     seekStart = seekEnd = 0;
     seeking = false;
+    getEventLabel = function() {
+      if (typeof eventLabel === 'function') {
+        return eventLabel();
+      } else {
+        return eventLabel;
+      }
+    };
     loaded = function() {
       if (!eventLabel) {
         eventLabel = this.currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i, '');
@@ -106,12 +113,12 @@
         ga('send', 'event', {
           'eventCategory': eventCategory,
           'eventAction': action,
-          'eventLabel': eventLabel,
+          'eventLabel': getEventLabel(),
           'eventValue': value,
           'nonInteraction': nonInteraction
         });
       } else if (window._gaq) {
-        _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction]);
+        _gaq.push(['_trackEvent', eventCategory, action, getEventLabel(), value, nonInteraction]);
       } else if (options.debug) {
         console.log("Google Analytics not detected");
       }

@@ -33,6 +33,9 @@ videojs.plugin 'ga', (options = {}) ->
   seekStart = seekEnd = 0
   seeking = false
 
+  getEventLabel = ->
+    return if typeof eventLabel is 'function' then eventLabel() else eventLabel
+
   loaded = ->
     unless eventLabel
       eventLabel = @currentSrc().split("/").slice(-1)[0].replace(/\.(\w{3,4})(\?.*)?$/i,'')
@@ -116,11 +119,11 @@ videojs.plugin 'ga', (options = {}) ->
       ga 'send', 'event',
         'eventCategory' 	: eventCategory
         'eventAction'		  : action
-        'eventLabel'		  : eventLabel
+        'eventLabel'		  : getEventLabel()
         'eventValue'      : value
         'nonInteraction'	: nonInteraction
     else if window._gaq
-      _gaq.push(['_trackEvent', eventCategory, action, eventLabel, value, nonInteraction])
+      _gaq.push(['_trackEvent', eventCategory, action, getEventLabel(), value, nonInteraction])
     else if options.debug
       console.log("Google Analytics not detected")
     return
